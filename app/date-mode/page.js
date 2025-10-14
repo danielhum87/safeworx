@@ -171,7 +171,7 @@ export default function DateModePage() {
   }
 
   const handleEndDate = async () => {
-    if (!confirm('Are you sure you\'re safe and want to end Date Mode?')) return
+    if (!confirm('Are you sure you&apos;re safe and want to end Date Mode?')) return
 
     try {
       const { error } = await supabase
@@ -182,7 +182,7 @@ export default function DateModePage() {
       if (error) throw error
 
       setActiveDate(null)
-      alert('Date Mode ended. Glad you\'re safe!')
+      alert('Date Mode ended. Glad you&apos;re safe!')
       
     } catch (err) {
       alert('Failed to end date mode: ' + err.message)
@@ -307,7 +307,7 @@ export default function DateModePage() {
             onClick={handleEndDate}
             className="w-full bg-white border-2 border-gray-300 text-gray-700 py-4 rounded-lg font-semibold hover:bg-gray-50"
           >
-            ✓ I'm Safe - End Date Mode
+            ✓ I&apos;m Safe - End Date Mode
           </button>
 
           {/* Info */}

@@ -131,7 +131,7 @@ export default function EmergencyModal({ isOpen, onClose, user, profile, contact
             onClick={handleSafe}
             className="w-full bg-blue-600 text-white py-4 rounded-lg font-semibold hover:bg-blue-700"
           >
-            I'm Safe Now
+            I&apos;m Safe Now
           </button>
         </div>
       </div>
