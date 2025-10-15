@@ -151,14 +151,15 @@ export default function DateModePage() {
   setCheckingImage(true)
 
   try {
-    const response = await fetch('/api/safety-check', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        dateName: formData.dateName,
-        dateLocation: formData.dateLocation || '' // Send location
-      })
-    })
+  const response = await fetch('/api/safety-check', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    dateName: formData.dateName,
+    dateLocation: formData.dateLocation || '',
+    dateAge: formData.dateAge || '' // Add age
+  })
+})
 
     const result = await response.json()
 
@@ -484,6 +485,25 @@ export default function DateModePage() {
       Adding location helps find more accurate results
     </p>
   </div>
+
+  {/* Age Input - NEW! */}
+<div className="mb-4">
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    Their Age (optional)
+  </label>
+  <input
+    type="number"
+    value={formData.dateAge || ''}
+    onChange={(e) => setFormData({...formData, dateAge: e.target.value})}
+    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    placeholder="e.g., 25"
+    min="18"
+    max="99"
+  />
+  <p className="text-xs text-gray-500 mt-1">
+    Helps narrow down results for common names
+  </p>
+</div>
 
               {/* Run Check Button */}
               {uploadedImage && (
