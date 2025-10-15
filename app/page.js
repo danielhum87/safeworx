@@ -18,12 +18,16 @@ export default function Home() {
             <a href="#pricing" className="text-gray-600 hover:text-gray-900">Pricing</a>
           </nav>
           <div className="flex space-x-4">
+            <Link href="/login">
             <button className="text-gray-600 hover:text-gray-900 font-medium">
               Sign In
-            </button>
+           </button>
+          </Link>
+           <Link href="/signup">
             <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-medium">
-              Get Started
-            </button>
+            Get Started
+           </button>
+          </Link>
           </div>
         </div>
       </header>
@@ -164,9 +168,11 @@ export default function Home() {
           <p className="text-xl text-blue-100 mb-8">
             Join thousands of people who refuse to work or date alone without backup.
           </p>
+          <Link href="/signup">
           <button className="bg-white text-blue-600 px-8 py-4 rounded-lg hover:bg-gray-100 font-semibold text-lg">
-            Start Your Free Trial
-          </button>
+          Start Your Free Trial
+         </button>
+        </Link>
           <p className="text-blue-100 text-sm mt-4">No credit card required • Cancel anytime</p>
         </div>
       </section>
