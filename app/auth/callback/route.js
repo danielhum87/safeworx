@@ -5,13 +5,18 @@ import { NextResponse } from 'next/server'
 export async function GET(request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
+  const type = requestUrl.searchParams.get('type')
 
   if (code) {
-    const cookieStore = cookies()
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+    const supabase = createRouteHandlerClient({ cookies })
     await supabase.auth.exchangeCodeForSession(code)
   }
 
-  // URL to redirect to after sign in process completes
-  return NextResponse.redirect(new URL('/dashboard', requestUrl.origin))
+  // If password recovery, redirect to update password page
+  if (type === 'recovery') {
+    return NextResponse.redirect(`${requestUrl.origin}/update-password`)
+  }
+
+  // Otherwise go to dashboard
+  return NextResponse.redirect(`${requestUrl.origin}/dashboard`)
 }
