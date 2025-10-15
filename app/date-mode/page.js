@@ -143,23 +143,19 @@ export default function DateModePage() {
   }
 
   const runSafetyCheck = async () => {
-  if (!formData.dateName || formData.dateName.trim() === '') {
-    alert('Please enter your date\'s name first!')
-    return
-  }
-
   setCheckingImage(true)
 
   try {
-  const response = await fetch('/api/safety-check', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    dateName: formData.dateName,
-    dateLocation: formData.dateLocation || '',
-    dateAge: formData.dateAge || '' // Add age
-  })
-})
+    const response = await fetch('/api/safety-check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        dateName: formData.dateName || '',
+        dateLocation: formData.dateLocation || '',
+        dateAge: formData.dateAge || '',
+        imageBase64: imagePreview || '' // Send the base64 image!
+      })
+    })
 
     const result = await response.json()
 
@@ -506,7 +502,7 @@ export default function DateModePage() {
 </div>
 
               {/* Run Check Button */}
-              {uploadedImage && (
+             
                 <button
                   type="button"
                   onClick={runSafetyCheck}
@@ -525,7 +521,7 @@ export default function DateModePage() {
                     '🔍 Run Safety Check'
                   )}
                 </button>
-              )}
+              
 
               {/* Results Display */}
               {safetyResults && (
