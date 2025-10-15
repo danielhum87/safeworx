@@ -143,44 +143,38 @@ export default function DateModePage() {
   }
 
   const runSafetyCheck = async () => {
-    if (!uploadedImage) {
-      alert('Please upload a photo first!')
-      return
+  if (!formData.dateName || formData.dateName.trim() === '') {
+    alert('Please enter your date\'s name first!')
+    return
+  }
+
+  setCheckingImage(true)
+
+  try {
+    const response = await fetch('/api/safety-check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        imageUrl: imagePreview || '', // Send preview but we're not using it yet
+        dateName: formData.dateName
+      })
+    })
+
+    const result = await response.json()
+
+    if (result.success) {
+      setSafetyResults(result)
+    } else {
+      throw new Error(result.error)
     }
 
-    setCheckingImage(true)
+  } catch (err) {
+    console.error('Safety check error:', err)
+    alert('Failed to run safety check: ' + err.message)
+  } finally {
+    setCheckingImage(false)
+  }
 
-    try {
-      const reader = new FileReader()
-      reader.readAsDataURL(uploadedImage)
-      
-      reader.onloadend = async () => {
-        const base64Image = reader.result
-
-        const response = await fetch('/api/safety-check', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            imageUrl: base64Image,
-            dateName: formData.dateName
-          })
-        })
-
-        const result = await response.json()
-
-        if (result.success) {
-          setSafetyResults(result)
-        } else {
-          throw new Error(result.error)
-        }
-      }
-
-    } catch (err) {
-      console.error('Safety check error:', err)
-      alert('Failed to run safety check: ' + err.message)
-    } finally {
-      setCheckingImage(false)
-    }
   }
 
   const handleActivate = async (e) => {
