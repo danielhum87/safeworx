@@ -10,7 +10,7 @@ export default function Home() {
             <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">S</span>
             </div>
-            <span className="text-2xl font-bold text-gray-900">SafeWorx</span>
+            <span className="text-2xl font-bold text-gray-900">HomeSafe</span>
           </div>
           <nav className="hidden md:flex space-x-8">
             <a href="#features" className="text-gray-600 hover:text-gray-900">Features</a>
@@ -40,8 +40,8 @@ export default function Home() {
             <span className="block text-blue-600">Save Your Life</span>
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            The safety app for lone workers, first dates, and anyone who works or meets people alone. 
-            Emergency alerts sent to your contacts and verified venues with a single tap.
+            Your safety companion for first dates, night outs, and working alone. 
+             One tap sends emergency alerts to your trusted contacts - so you always make it home safe.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             
@@ -143,19 +143,18 @@ export default function Home() {
       <section className="py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-blue-50 border-l-4 border-blue-600 p-8 rounded-r-xl">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">Why I Built SafeWorx</h3>
-            <p className="text-gray-700 mb-4">
-              "Three years ago, I was trapped in a customer's bathroom by someone threatening me with a knife. 
-              I'm a gas engineer - I work alone in people's homes every day. That day, nobody knew where I was. 
-              I had no way to call for help without making things worse."
-            </p>
-            <p className="text-gray-700 mb-4">
-              "I barely escaped. But it made me realize: there are millions of people who work alone, meet strangers, 
-              or put themselves in vulnerable situations every single day. And most have no safety net."
-            </p>
-            <p className="text-gray-700 font-semibold">
-              "SafeWorx is that safety net. Because nobody should die because they couldn't call for help."
-            </p>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">Why I Built HomeSafe</h3>
+              <p className="text-gray-700 mb-4">
+                "Three years ago, I was attacked while working alone. Nobody knew where I was. 
+                I had no way to call for help without making things worse. I barely escaped."
+              </p>
+              <p className="text-gray-700 mb-4">
+                "That experience made me realize: millions of people work alone, go on first dates with strangers, 
+                or walk home late at night - often with no safety net. One wrong situation and nobody knows to help."
+              </p>
+              <p className="text-gray-700 font-semibold">
+                "HomeSafe is that safety net. Because everyone deserves to make it home safe."
+              </p>
             <p className="text-gray-600 mt-4">— James, Founder</p>
           </div>
         </div>
@@ -186,7 +185,7 @@ export default function Home() {
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold">S</span>
                 </div>
-                <span className="text-white font-bold text-lg">SafeWorx</span>
+                <span className="text-white font-bold text-lg">HomeSafe</span>
               </div>
               <p className="text-sm">Making the world safer, one tap at a time.</p>
             </div>
@@ -215,7 +214,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
-            <p>&copy; 2025 SafeWorx. All rights reserved.</p>
+            <p>&copy; 2025 HomeSafe. All rights reserved.</p>
           </div>
         </div>
       </footer>

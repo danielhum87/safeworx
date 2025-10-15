@@ -12,13 +12,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "SafeWorx - Personal Safety App",
+  title: "HomeSafe - Personal Safety App",
   description: "Emergency alert system for lone workers and first dates",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "SafeWorx"
+    title: "HomeSafe"
   }
 };
 
@@ -39,7 +39,7 @@ export default function RootLayout({ children }) {
         <meta name="theme-color" content="#2563eb" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="SafeWorx" />
+        <meta name="apple-mobile-web-app-title" content="HomeSafe" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

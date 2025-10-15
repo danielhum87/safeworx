@@ -222,7 +222,7 @@ export default function DateModePage() {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">S</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">SafeWorx</span>
+              <span className="text-xl font-bold text-gray-900">HomeSafe</span>
             </Link>
             <button onClick={handleLogout} className="text-gray-600 hover:text-gray-900 font-medium text-sm">
               Logout
@@ -313,7 +313,7 @@ export default function DateModePage() {
           {/* Info */}
           <div className="mt-6 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
             <p className="text-yellow-800 text-sm">
-              <strong>Tip:</strong> Keep SafeWorx open in the background. Your emergency contact knows where you are and who you're with.
+              <strong>Tip:</strong> Keep HomeSafe open in the background. Your emergency contact knows where you are and who you're with.
             </p>
           </div>
         </main>
@@ -340,7 +340,7 @@ export default function DateModePage() {
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">S</span>
             </div>
-            <span className="text-xl font-bold text-gray-900">SafeWorx</span>
+            <span className="text-xl font-bold text-gray-900">HomeSafe</span>
           </Link>
           <button onClick={handleLogout} className="text-gray-600 hover:text-gray-900 font-medium text-sm">
             Logout

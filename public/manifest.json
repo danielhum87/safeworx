@@ -1,6 +1,6 @@
 {
-  "name": "SafeWorx - Personal Safety App",
-  "short_name": "SafeWorx",
+  "name": "HomeSafe - Personal Safety App",
+  "short_name": "HomeSafe",
   "description": "Emergency alert system for lone workers and first dates",
   "start_url": "/dashboard",
   "display": "standalone",

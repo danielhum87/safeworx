@@ -29,7 +29,7 @@ export async function POST(request) {
 
     // Send SMS to all contacts
     const smsPromises = contacts.map(async (contact) => {
-      const message = `🚨 EMERGENCY ALERT from ${userName}!\n\nThey need help NOW!\n\nLocation: ${locationLink}\n\nCall them: ${userPhone || 'No phone provided'}\n\nThis is an automated SafeWorx emergency alert.`
+      const message = `🚨 EMERGENCY ALERT from ${userName}!\n\nThey need help NOW!\n\nLocation: ${locationLink}\n\nCall them: ${userPhone || 'No phone provided'}\n\nThis is an automated HomeSafe emergency alert.`
 
       try {
         const result = await client.messages.create({
