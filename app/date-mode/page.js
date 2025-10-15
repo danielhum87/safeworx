@@ -155,8 +155,8 @@ export default function DateModePage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        imageUrl: imagePreview || '', // Send preview but we're not using it yet
-        dateName: formData.dateName
+        dateName: formData.dateName,
+        dateLocation: formData.dateLocation || '' // Send location
       })
     })
 
@@ -165,7 +165,7 @@ export default function DateModePage() {
     if (result.success) {
       setSafetyResults(result)
     } else {
-      throw new Error(result.error)
+      throw new Error(result.error || 'Safety check failed')
     }
 
   } catch (err) {
@@ -174,8 +174,7 @@ export default function DateModePage() {
   } finally {
     setCheckingImage(false)
   }
-
-  }
+}
 
   const handleActivate = async (e) => {
     e.preventDefault()
@@ -468,6 +467,23 @@ export default function DateModePage() {
                   )}
                 </div>
               </div>
+
+                {/* Location Input - NEW! */}
+  <div className="mb-4">
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Their Location (City/Area)
+    </label>
+    <input
+      type="text"
+      value={formData.dateLocation || ''}
+      onChange={(e) => setFormData({...formData, dateLocation: e.target.value})}
+      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      placeholder="e.g., Manchester, Birmingham, London"
+    />
+    <p className="text-xs text-gray-500 mt-1">
+      Adding location helps find more accurate results
+    </p>
+  </div>
 
               {/* Run Check Button */}
               {uploadedImage && (
