@@ -17,6 +17,12 @@ export default function DateModePage() {
   const [showEmergencyModal, setShowEmergencyModal] = useState(false)
   const [location, setLocation] = useState(null)
   
+  // Safety Check States
+  const [uploadedImage, setUploadedImage] = useState(null)
+  const [imagePreview, setImagePreview] = useState(null)
+  const [checkingImage, setCheckingImage] = useState(false)
+  const [safetyResults, setSafetyResults] = useState(null)
+  
   const [formData, setFormData] = useState({
     dateName: '',
     venueName: '',
@@ -92,7 +98,6 @@ export default function DateModePage() {
       if (error) throw error
       setContacts(data || [])
       
-      // Auto-select primary contact
       const primary = data?.find(c => c.is_primary)
       if (primary) {
         setFormData(prev => ({ ...prev, emergencyContactId: primary.id }))
@@ -124,6 +129,60 @@ export default function DateModePage() {
     })
   }
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setUploadedImage(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result)
+      }
+      reader.readAsDataURL(file)
+      setSafetyResults(null)
+    }
+  }
+
+  const runSafetyCheck = async () => {
+    if (!uploadedImage) {
+      alert('Please upload a photo first!')
+      return
+    }
+
+    setCheckingImage(true)
+
+    try {
+      const reader = new FileReader()
+      reader.readAsDataURL(uploadedImage)
+      
+      reader.onloadend = async () => {
+        const base64Image = reader.result
+
+        const response = await fetch('/api/safety-check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            imageUrl: base64Image,
+            dateName: formData.dateName
+          })
+        })
+
+        const result = await response.json()
+
+        if (result.success) {
+          setSafetyResults(result)
+        } else {
+          throw new Error(result.error)
+        }
+      }
+
+    } catch (err) {
+      console.error('Safety check error:', err)
+      alert('Failed to run safety check: ' + err.message)
+    } finally {
+      setCheckingImage(false)
+    }
+  }
+
   const handleActivate = async (e) => {
     e.preventDefault()
     
@@ -136,7 +195,6 @@ export default function DateModePage() {
     setSaving(true)
 
     try {
-      // Create date record
       const { data: dateData, error: dateError } = await supabase
         .from('dates')
         .insert([
@@ -158,8 +216,6 @@ export default function DateModePage() {
       if (dateError) throw dateError
 
       setActiveDate(dateData)
-      
-      // Show success message
       alert('Date Mode activated! Your emergency contact has been notified.')
 
     } catch (err) {
@@ -171,7 +227,7 @@ export default function DateModePage() {
   }
 
   const handleEndDate = async () => {
-    if (!confirm('Are you sure you&apos;re safe and want to end Date Mode?')) return
+    if (!confirm('Are you sure you are safe and want to end Date Mode?')) return
 
     try {
       const { error } = await supabase
@@ -182,7 +238,7 @@ export default function DateModePage() {
       if (error) throw error
 
       setActiveDate(null)
-      alert('Date Mode ended. Glad you&apos;re safe!')
+      alert('Date Mode ended. Glad you are safe!')
       
     } catch (err) {
       alert('Failed to end date mode: ' + err.message)
@@ -193,12 +249,32 @@ export default function DateModePage() {
     if (!activeDate) return
     
     const excuse = activeDate.excuse_template
-    alert(`Your emergency contact will call you now!\n\nThey'll say: "${excuse}"\n\n(In production, this triggers an actual call)`)
+    alert(`Your emergency contact will call you now!\n\nThey will say: "${excuse}"\n\n(In production, this triggers an actual call)`)
   }
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
     router.push('/')
+  }
+
+  const getConfidenceColor = (confidence) => {
+    switch(confidence) {
+      case 'HIGH': return 'text-green-700 bg-green-50 border-green-600'
+      case 'MEDIUM': return 'text-yellow-700 bg-yellow-50 border-yellow-600'
+      case 'LOW': return 'text-orange-700 bg-orange-50 border-orange-600'
+      case 'VERY_LOW': return 'text-red-700 bg-red-50 border-red-600'
+      default: return 'text-gray-700 bg-gray-50 border-gray-600'
+    }
+  }
+
+  const getConfidenceText = (confidence) => {
+    switch(confidence) {
+      case 'HIGH': return '✅ Photo appears genuine (found on 1 profile)'
+      case 'MEDIUM': return '⚠️ Photo found on 2-3 profiles'
+      case 'LOW': return '⚠️ Photo found on 4-10 profiles'
+      case 'VERY_LOW': return '🚨 Photo found on 10+ profiles (likely fake)'
+      default: return '❓ Unable to verify photo'
+    }
   }
 
   if (loading) {
@@ -220,7 +296,7 @@ export default function DateModePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
             <Link href="/dashboard" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">S</span>
+                <span className="text-white font-bold text-lg">H</span>
               </div>
               <span className="text-xl font-bold text-gray-900">HomeSafe</span>
             </Link>
@@ -231,14 +307,13 @@ export default function DateModePage() {
         </header>
 
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Active Status Banner */}
           <div className="bg-pink-500 text-white rounded-2xl p-6 mb-6 shadow-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="text-4xl">💝</div>
                 <div>
                   <h2 className="text-2xl font-bold">Date Mode Active</h2>
-                  <p className="text-pink-100">You're protected</p>
+                  <p className="text-pink-100">You are protected</p>
                 </div>
               </div>
               <div className="animate-pulse">
@@ -247,7 +322,6 @@ export default function DateModePage() {
             </div>
           </div>
 
-          {/* Date Details */}
           <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
             <h3 className="font-bold text-xl mb-4">Date Details</h3>
             <div className="space-y-3">
@@ -273,9 +347,7 @@ export default function DateModePage() {
             </div>
           </div>
 
-          {/* Quick Actions */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-            {/* Fake Call */}
             <button
               onClick={handleFakeCall}
               className="bg-blue-500 text-white rounded-2xl p-6 shadow-lg hover:bg-blue-600 transition-all"
@@ -285,7 +357,6 @@ export default function DateModePage() {
               <p className="text-blue-100 text-sm">Get an excuse to leave</p>
             </button>
 
-            {/* Emergency Alert */}
             <button
               onClick={() => setShowEmergencyModal(true)}
               className="bg-red-500 text-white rounded-2xl p-6 shadow-lg hover:bg-red-600 transition-all w-full text-left"
@@ -296,29 +367,25 @@ export default function DateModePage() {
             </button>
           </div>
 
-          {/* Your Excuse */}
           <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mb-6">
             <p className="text-blue-900 text-sm font-semibold mb-1">Your Preset Excuse:</p>
-            <p className="text-blue-800 text-sm">"{activeDate.excuse_template}"</p>
+            <p className="text-blue-800 text-sm">{activeDate.excuse_template}</p>
           </div>
 
-          {/* End Date Mode */}
           <button
             onClick={handleEndDate}
             className="w-full bg-white border-2 border-gray-300 text-gray-700 py-4 rounded-lg font-semibold hover:bg-gray-50"
           >
-            ✓ I&apos;m Safe - End Date Mode
+            ✓ I am Safe - End Date Mode
           </button>
 
-          {/* Info */}
           <div className="mt-6 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
             <p className="text-yellow-800 text-sm">
-              <strong>Tip:</strong> Keep HomeSafe open in the background. Your emergency contact knows where you are and who you're with.
+              <strong>Tip:</strong> Keep HomeSafe open in the background. Your emergency contact knows where you are and who you are with.
             </p>
           </div>
         </main>
 
-        {/* Emergency Modal */}
         <EmergencyModal
           isOpen={showEmergencyModal}
           onClose={() => setShowEmergencyModal(false)}
@@ -331,14 +398,14 @@ export default function DateModePage() {
     )
   }
 
-  // Setup Date Mode Screen
+  // Setup Date Mode Screen with Safety Check
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <Link href="/dashboard" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">S</span>
+              <span className="text-white font-bold text-lg">H</span>
             </div>
             <span className="text-xl font-bold text-gray-900">HomeSafe</span>
           </Link>
@@ -355,7 +422,7 @@ export default function DateModePage() {
           </Link>
           <h1 className="text-3xl font-bold text-gray-900">Date Mode</h1>
           <p className="text-gray-600 mt-2">
-            Set up safety for your date - we'll notify your emergency contact and stay on standby
+            Set up safety for your date - we will notify your emergency contact and stay on standby
           </p>
         </div>
 
@@ -376,6 +443,141 @@ export default function DateModePage() {
           </div>
         ) : (
           <form onSubmit={handleActivate} className="space-y-6">
+            {/* SAFETY CHECK CARD */}
+            <div className="bg-white rounded-2xl shadow-sm p-6 border-2 border-blue-200">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="font-bold text-xl text-blue-900">🔍 Safety Check (NEW!)</h3>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Check your date photo for catfishes and background info
+                  </p>
+                </div>
+              </div>
+
+              {/* Photo Upload */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Upload Date Photo (from Tinder/Hinge)
+                </label>
+                <div className="flex items-center space-x-4">
+                  <label className="cursor-pointer bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium">
+                    📸 Choose Photo
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                  </label>
+                  {imagePreview && (
+                    <img src={imagePreview} alt="Preview" className="w-20 h-20 rounded-lg object-cover border-2 border-gray-300" />
+                  )}
+                </div>
+              </div>
+
+              {/* Run Check Button */}
+              {uploadedImage && (
+                <button
+                  type="button"
+                  onClick={runSafetyCheck}
+                  disabled={checkingImage}
+                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 mb-4"
+                >
+                  {checkingImage ? (
+                    <span className="flex items-center justify-center">
+                      <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Checking...
+                    </span>
+                  ) : (
+                    '🔍 Run Safety Check'
+                  )}
+                </button>
+              )}
+
+              {/* Results Display */}
+              {safetyResults && (
+                <div className="space-y-4">
+                  {/* Confidence Score */}
+                  <div className={`border-l-4 p-4 rounded-r-lg ${getConfidenceColor(safetyResults.confidence)}`}>
+                    <p className="font-semibold mb-2">Photo Verification:</p>
+                    <p className="text-sm">{getConfidenceText(safetyResults.confidence)}</p>
+                    <p className="text-xs mt-2">Found {safetyResults.photoMatches} matching profiles online</p>
+                  </div>
+
+                  {/* Names Found */}
+                  {safetyResults.extractedNames.length > 0 && (
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <p className="font-semibold text-sm mb-2">👤 Names Associated with This Photo:</p>
+                      <ul className="text-sm space-y-1">
+                        {safetyResults.extractedNames.map((name, idx) => (
+                          <li key={idx} className="text-gray-700">• {name}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* News Results */}
+                  {safetyResults.newsResults.map((nameResult, idx) => (
+                    <div key={idx} className="border border-gray-200 rounded-lg p-4">
+                      <p className="font-semibold mb-3">📰 News for {nameResult.name}</p>
+                      {nameResult.articles.length > 0 ? (
+                        <div className="space-y-3">
+                          {nameResult.articles.map((article, articleIdx) => (
+                            <div key={articleIdx} className="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded-r">
+                              <p className="font-medium text-sm text-yellow-900">{article.title}</p>
+                              <p className="text-xs text-yellow-700 mt-1">{article.source} - {article.date}</p>
+                              <p className="text-xs text-yellow-800 mt-2">{article.snippet}</p>
+                              <a 
+                                href={article.link} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-800 text-xs font-medium mt-2 inline-block"
+                              >
+                                Read Full Article →
+                              </a>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-green-700 bg-green-50 p-3 rounded">✅ No concerning news found</p>
+                      )}
+                    </div>
+                  ))}
+
+                  {/* Social Profiles */}
+                  {safetyResults.socialProfiles.length > 0 && (
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <p className="font-semibold text-sm mb-2">🔗 Photo appears on:</p>
+                      <div className="space-y-2">
+                        {safetyResults.socialProfiles.slice(0, 5).map((profile, idx) => (
+                          <div key={idx} className="text-xs">
+                            <a href={profile.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                              {profile.title || profile.source}
+                            </a>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Disclaimer */}
+                  <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg">
+                    <p className="text-red-900 font-semibold text-xs mb-2">⚠️ IMPORTANT DISCLAIMERS:</p>
+                    <ul className="text-red-800 text-xs space-y-1">
+                      <li>• This is NOT a formal background check</li>
+                      <li>• Common names may show unrelated people</li>
+                      <li>• Information is from public sources only</li>
+                      <li>• Some matches may be coincidental</li>
+                      <li>• Always trust your instincts</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Date Details Card */}
             <div className="bg-white rounded-2xl shadow-sm p-6">
               <h3 className="font-bold text-xl mb-4">Date Details</h3>
@@ -481,7 +683,7 @@ export default function DateModePage() {
                     ))}
                   </select>
                   <p className="text-xs text-gray-500 mt-1">
-                    They'll be notified when you activate Date Mode
+                    They will be notified when you activate Date Mode
                   </p>
                 </div>
 
@@ -503,7 +705,7 @@ export default function DateModePage() {
                     ))}
                   </select>
                   <p className="text-xs text-gray-500 mt-1">
-                    Preview: "{excuseTemplates[formData.excuseTemplate]}"
+                    Preview: {excuseTemplates[formData.excuseTemplate]}
                   </p>
                 </div>
               </div>
@@ -542,7 +744,6 @@ export default function DateModePage() {
         )}
       </main>
 
-      {/* Emergency Modal */}
       <EmergencyModal
         isOpen={showEmergencyModal}
         onClose={() => setShowEmergencyModal(false)}
